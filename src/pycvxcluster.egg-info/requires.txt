@@ -1,0 +1,7 @@
+numpy>=1.22
+scipy>=1.9
+scikit-learn>=1.1
+scikit-sparse>=0.4.12
+
+[alt]
+pylops>=2.0

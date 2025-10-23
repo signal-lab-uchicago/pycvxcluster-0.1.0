@@ -1,0 +1,26 @@
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pycvxcluster"
+version = "0.1.0"
+description = "Convex clustering (SSNAL/ADMM) utilities used by Graph-aligned pLSI"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name="Your Name"}]
+dependencies = [
+  "numpy>=1.22",
+  "scipy>=1.9",
+  "scikit-learn>=1.1",
+  "scikit-sparse>=0.4.12"
+]
+
+[project.optional-dependencies]
+alt = ["pylops>=2.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["pycvxcluster*"]

@@ -1,0 +1,54 @@
+Metadata-Version: 2.4
+Name: pycvxcluster
+Version: 0.1.0
+Summary: Convex clustering (SSNAL/ADMM) utilities used by Graph-aligned pLSI
+Author: Your Name
+License: MIT
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.22
+Requires-Dist: scipy>=1.9
+Requires-Dist: scikit-learn>=1.1
+Requires-Dist: scikit-sparse>=0.4.12
+Provides-Extra: alt
+Requires-Dist: pylops>=2.0; extra == "alt"
+Dynamic: license-file
+
+
+# pycvxcluster (local package)
+
+This is a local, installable packaging of your `pycvxcluster` convex clustering utilities.
+
+## Install
+
+```bash
+pip install ./pycvxcluster_pkg
+# or editable:
+pip install -e ./pycvxcluster_pkg
+```
+
+(Optional) For the alternative solver:
+```bash
+pip install 'pycvxcluster[alt]'
+```
+
+## Usage
+
+```python
+# The graphSVD code expects this path:
+from pycvxcluster.pycvxcluster import SSNAL
+
+# Or directly:
+from pycvxcluster import SSNAL
+
+ssnal = SSNAL(gamma=1.0, verbose=1)
+ssnal.fit(X=features, weight_matrix=W, save_centers=True)
+U_tilde = ssnal.centers_.T
+```
+
+The `SSNAL` class internally calls:
+- `compute_weight_matrix` / `get_nam_wv_from_wm` (graph weights)
+- `ssnal_wrapper` (solver)
+- `find_clusters` (post-processing)
+# pycvxcluster-0.1.0
