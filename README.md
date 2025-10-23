@@ -1,7 +1,9 @@
 
-# pycvxcluster (local package)
+# pycvxcluster 
 
-This is a local, installable packaging of your `pycvxcluster` convex clustering utilities.
+This is an implementation of the convex clustering method of Sun et al, 2021[1].
+
+[1] Sun, Defeng, Kim-Chuan Toh, and Yancheng Yuan. "Convex clustering: Model, theoretical guarantee and efficient algorithm." Journal of Machine Learning Research 22.9 (2021): 1-32.
 
 ## Install
 
