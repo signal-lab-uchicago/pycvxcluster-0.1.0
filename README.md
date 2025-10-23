@@ -115,7 +115,6 @@ for g in np.geomspace(1e-2, 10, 12)[1:]:
     ssnal.kwargs.update(x0=ssnal.centers_, y0=getattr(ssnal, "y_", None), z0=getattr(ssnal, "z_", None))
 ```
 
-This mirrors how your GraphSVD code sweeps λ with warm‑starts. The estimator’s `kwargs` dict is forwarded to the underlying `ssnal_wrapper`, so `x0`, `y0`, `z0` are picked up automatically.
 
 ---
 
@@ -142,25 +141,6 @@ SSNAL(
 **Key attributes after `fit`:**  
 `centers_`, `labels_`, `n_clusters_`, `weight_matrix_`, `node_arc_matrix_`, `weight_vec_`, `primobj_`, `dualobj_`, `eta_`, `iter_`, `termination_`, `ssnal_runtime_`, `total_time_`.
 
----
-
-## Using with Graph‑GpLSI (GraphSVD)
-
-The estimator integrates directly in your GraphSVD step—exactly how your code already does it during the λ‑grid search and the final pass; you update `ssnal.gamma`, reuse the internal warm‑starts, and feed back the smoothed centers as `U_tilde`. (See the `lambda_search` and `update_U_tilde` calls in your GraphSVD implementation.)
-
-Minimal sketch:
-
-```python
-# inside your graphSVD loop
-ssnal = SSNAL(verbose=0)
-for lambd in lambd_grid:
-    ssnal.gamma = lambd
-    ssnal.fit(X=X_tilde @ V, weight_matrix=W, save_centers=True, save_labels=False,
-              recalculate_weights=(lambd is lambd_grid[0]))
-    # warm-starts for next iteration
-    ssnal.kwargs.update(x0=ssnal.centers_, y0=ssnal.y_, z0=ssnal.z_)
-U_tilde = ssnal.centers_.T
-```
 
 ---
 
