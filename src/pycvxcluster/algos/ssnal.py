@@ -297,9 +297,11 @@ def ssncg(
     Rd = np.maximum(np.sqrt(np.sum(z0 * z0, axis=0)) - weight_vec, 0)
     normRd = np.sum(Rd)
     #print(Rd)
+    dualinf_sub = normRd * cscale / (1 + normborg * cscale)
 
     priminf_hist = np.zeros(maxitersub)
-    dualinf_hist = np.zeros(maxitersub)
+    dualinf_hist = np.zeros(maxitersub + 1, dtype=np.float64)
+    dualinf_hist[0] = dualinf_sub 
     Ly_hist = np.zeros(maxitersub)
     solve_ok_hist = np.zeros(maxitersub)
     psqmr_hist = np.zeros(maxitersub)
@@ -342,7 +344,11 @@ def ssncg(
 
         if itersub >= 1:
             prim_ratio = priminf_sub / priminf_hist[itersub - 1]
-            dual_ratio = dualinf_sub / dualinf_hist[itersub - 1]
+            den = dualinf_hist[itersub - 1]
+            if not np.isfinite(den) or den <= 0:
+                dual_ratio = np.inf
+            else:
+                dual_ratio = dualinf_sub / den
         else:
             prim_ratio = 0
             dual_ratio = 0
@@ -441,8 +447,21 @@ def update_breakyes(
     priminf_1half = np.nanmin(priminf_hist[: math.ceil(itersub * const3)])
     priminf_2half = np.nanmin(priminf_hist[math.ceil(itersub * const3) :])
     priminf_best = np.nanmin(priminf_hist[:itersub])
+    # where you update and compute the ratio:
+
+
+    if itersub == 0:
+        dualinf_ratio = np.inf  # or 1.0, depending on your stopping logic
+    else:
+        prev = dualinf_hist[itersub - 1]
+        if not np.isfinite(prev) or prev <= 1e-12:
+            # previous is zero/NaN/inf → define a safe ratio
+            dualinf_ratio = np.inf if dualinf_hist[itersub] > 1e-12 else 1.0
+        else:
+            dualinf_ratio = dualinf_hist[itersub] / prev
+
+
     priminf_ratio = priminf_hist[itersub] / priminf_hist[itersub - 1]
-    dualinf_ratio = dualinf_hist[itersub] / dualinf_hist[itersub - 1]
     _, stagnate_idx, _ = find(solve_ok_hist[: itersub + 1] <= -1)
     stagnate_count = len(stagnate_idx)
     idx2 = np.arange(max(0, itersub - 7), itersub + 1)

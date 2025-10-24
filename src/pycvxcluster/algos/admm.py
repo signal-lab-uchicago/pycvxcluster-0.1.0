@@ -3,7 +3,8 @@ from scipy.sparse import csr_array
 from pycvxcluster.algos.helpers import prox_l2
 from pycvxcluster.algos.helpers import proj_l2
 from pycvxcluster.algos.helpers import fnorm
-from sksparse.cholmod import cholesky
+from sksparse.cholmod import cholesky, cholesky_AAt
+from scipy.sparse import csc_matrix, eye
 from scipy.sparse import eye
 import scipy.sparse.linalg as sla
 import time
@@ -29,7 +30,21 @@ def admm_l2(
     d, n = X.shape
     E = len(weight_vec)
 
-    factor = cholesky(eye(n) + sigma * A @ A.T)
+
+
+    # Ensure CSC *matrix* types (not sparse arrays)
+    A = csc_matrix(A, dtype=np.float64)
+    I = eye(n, format="csc", dtype=np.float64)
+
+
+    # cholesky_AAt without forming A A^T
+    A_scaled = A * np.sqrt(sigma)
+    factor = cholesky_AAt(A_scaled, beta=1.0)   # factors I + sigma A A^T
+
+
+
+
+    #factor = cholesky(eye(n) + sigma * A @ A.T)
 
     msg = ""
     if xi0 is None:
